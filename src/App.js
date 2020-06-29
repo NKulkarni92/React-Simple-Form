@@ -50,6 +50,9 @@ const emailValidator = (value) => (
 const requiredValidator = (value) => {
   return value ? "" : "This field is required";
 }
+const mobileValidator = (value) => (
+  new RegExp(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im).test(value) ? "" : "Please enter a valid Mobile Number."
+);
 
 export default function App() {
   const handleSubmit = (data) => {
@@ -85,6 +88,13 @@ export default function App() {
             validator={requiredValidator} />
 
           <Field 
+            label="Mobile Number"
+            name="Mobile"
+            fieldType="Mobile"
+            component={CustomInput}
+            validator={requiredValidator, mobileValidator} />
+
+          <Field 
             label="Country"
             name="country"
             component={CustomDropDown}
@@ -98,7 +108,7 @@ export default function App() {
             validator={requiredValidator} />
 
           <button disabled={!formRenderProps.allowSubmit}>
-            Submit
+            Sign Up
           </button>
         </form>
       )}>
