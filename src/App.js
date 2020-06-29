@@ -1,26 +1,109 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import { Form, Field } from "@progress/kendo-react-form";
+import { Input, Checkbox } from "@progress/kendo-react-inputs";
+import { DropDownList } from "@progress/kendo-react-dropdowns";
+import countries from "./countries";
 
-function App() {
+const CustomInput = ({ fieldType, ...others }) => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Input
+        type={fieldType}
+        {...others} />
+      <ValidationMessage {...others} />
     </div>
+  );
+};
+
+const CustomDropDown = ({ options, ...others }) => {
+  return (
+    <div>
+      <DropDownList
+        data={options}
+        {...others} />
+      <ValidationMessage {...others} />
+    </div>
+  )
+}
+
+const CustomCheckbox = ({ ...props }) => {
+  return (
+    <div>
+      <Checkbox {...props} />
+      <ValidationMessage {...props} />
+    </div>
+  );
+};
+
+const ValidationMessage = ({ valid, visited, validationMessage }) => {
+  return (
+    <>
+    { !valid && visited &&
+        (<div className="required">{validationMessage}</div>)}
+    </>
   );
 }
 
-export default App;
+const emailValidator = (value) => (
+  new RegExp(/\S+@\S+\.\S+/).test(value) ? "" : "Please enter a valid email."
+);
+const requiredValidator = (value) => {
+  return value ? "" : "This field is required";
+}
+
+export default function App() {
+  const handleSubmit = (data) => {
+    console.log(`
+      Email: ${data.email}
+      Password: ${data.password}
+      Country: ${data.country}
+      Accepted Terms: ${data.acceptedTerms}
+    `);
+    
+    this.event.preventDefault();
+  }
+
+  return (
+    <Form
+      onSubmit={handleSubmit}
+      render={(formRenderProps) => (
+        <form onSubmit={formRenderProps.onSubmit}>
+          <h1>Create Account</h1>
+
+          <Field
+            label="Email"
+            name="email"
+            fieldType="email"
+            component={CustomInput}
+            validator={[requiredValidator, emailValidator]} />
+          
+          <Field
+            label="Password"
+            name="password"
+            fieldType="password"
+            component={CustomInput}
+            validator={requiredValidator} />
+
+          <Field 
+            label="Country"
+            name="country"
+            component={CustomDropDown}
+            options={countries}
+            validator={requiredValidator} />
+
+          <Field
+            label="I accept the terms of service"
+            name="acceptedTerms"
+            component={CustomCheckbox}
+            validator={requiredValidator} />
+
+          <button disabled={!formRenderProps.allowSubmit}>
+            Submit
+          </button>
+        </form>
+      )}>
+    </Form>
+  );
+}
+
+//export default App;
